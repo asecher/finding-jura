@@ -3,6 +3,7 @@ import 'package:finding_jura/components/world.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flutter/material.dart';
 
 class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
   late final CameraComponent cameraComponent;
@@ -16,6 +17,9 @@ class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
   }
 
   @override
+  Color backgroundColor() => const Color(0xFF84C669);
+
+  @override
   Future<void> onLoad() async {
     await images.loadAll([
       Assets.characters.player.poses.idle.path,
@@ -25,6 +29,7 @@ class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
       Assets.characters.player.poses.run4.path,
       Assets.characters.player.poses.run5.path,
       Assets.characters.player.poses.run6.path,
+      Assets.hud.inputs.tile0012.path,
     ]);
     addAll([cameraComponent, world]);
   }

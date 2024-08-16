@@ -26,7 +26,9 @@ class Player extends PositionComponent
     LogicalKeyboardKey.arrowRight
   };
 
-  Player()
+  final JoystickComponent joystick;
+
+  Player({required this.joystick})
       : super(
           anchor: Anchor.center,
           priority: 1,
@@ -73,7 +75,32 @@ class Player extends PositionComponent
   @override
   void update(double dt) {
     final originalPosition = position.clone();
-    Vector2 movementThisFrame = movement * speed * dt;
+
+    Vector2 movementThisFrame;
+
+    if (!joystick.delta.isZero()) {
+      horizontalDirection = 0;
+      movementThisFrame = joystick.delta.normalized() * speed * dt;
+
+      switch (joystick.direction) {
+        case JoystickDirection.left:
+        case JoystickDirection.upLeft:
+        case JoystickDirection.downLeft:
+          horizontalDirection = -1;
+          break;
+
+        case JoystickDirection.right:
+        case JoystickDirection.upRight:
+        case JoystickDirection.downRight:
+          horizontalDirection = 1;
+          break;
+        default:
+          break;
+      }
+    } else {
+      movementThisFrame = movement * speed * dt;
+    }
+
     position.add(movementThisFrame);
     position = originalPosition..add(movementThisFrame);
 
@@ -98,8 +125,6 @@ class Player extends PositionComponent
     } else if (horizontalDirection > 0 && scale.x < 0) {
       flipHorizontally();
     }
-
-    super.update(dt);
   }
 
   @override
