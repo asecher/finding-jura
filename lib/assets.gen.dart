@@ -12,8 +12,14 @@ import 'package:flutter/widgets.dart';
 class $AssetsCharactersGen {
   const $AssetsCharactersGen();
 
+  /// File path: assets/characters/cat1.png
+  AssetGenImage get cat1 => const AssetGenImage('assets/characters/cat1.png');
+
   /// Directory path: assets/characters/player
   $AssetsCharactersPlayerGen get player => const $AssetsCharactersPlayerGen();
+
+  /// List of all assets
+  List<AssetGenImage> get values => [cat1];
 }
 
 class $AssetsHudGen {

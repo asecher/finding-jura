@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:finding_jura/assets.gen.dart';
+import 'package:finding_jura/components/jura.dart';
 import 'package:finding_jura/components/player.dart';
 import 'package:finding_jura/components/timer.dart';
 import 'package:finding_jura/constants.dart';
@@ -13,11 +14,21 @@ import 'package:flutter/material.dart';
 
 const mapHeight = 120;
 const mapWidth = 196;
+const double startingTime = 540; // 9 minutes
 
 Random rnd = Random();
 
+enum GameStatus {
+  playing,
+  won,
+  lost,
+}
+
 class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
+  GameStatus gameStatus = GameStatus.playing;
+
   late final Player player;
+  late final Jura jura;
   late final JoystickComponent joystick;
   late final CountdownTimerComponent gameTimer;
   late final TiledComponent map;
@@ -27,14 +38,12 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
     mapHeight * worldTileSize,
   );
 
-  @override
-  Future<void> onLoad() async {
-    map = await TiledComponent.load(
-      Assets.world.level,
-      Vector2.all(worldTileSize),
-      prefix: '',
-    );
+  get score => gameTimer.formatTime(startingTime - gameTimer.remainingTime);
 
+  Vector2? _lastJuraSpawnPoint;
+  Vector2? _lastPlayerSpawnPoint;
+
+  Vector2 _getPlayerSpawnPoint() {
     final playerSpawnPoint =
         map.tileMap.getLayer<ObjectGroup>('playerSpawnPoints')!;
     final possiblePlayerSpawnPoints = <Vector2>{};
@@ -46,8 +55,39 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
         ),
       );
     }
-
     final playerSpawnPointIndex = rnd.nextInt(possiblePlayerSpawnPoints.length);
+    final spawn = possiblePlayerSpawnPoints.elementAt(playerSpawnPointIndex);
+    _lastPlayerSpawnPoint = spawn;
+
+    return spawn;
+  }
+
+  Vector2 _getJuraSpawnPoint() {
+    final juraSpawnPoint =
+        map.tileMap.getLayer<ObjectGroup>('juraSpawnPoints')!;
+    final possibleJuraSpawnPoints = <Vector2>{};
+    for (final object in juraSpawnPoint.objects) {
+      possibleJuraSpawnPoints.add(
+        Vector2(
+          object.x * worldScale,
+          object.y * worldScale,
+        ),
+      );
+    }
+    final juraSpawnPointIndex = rnd.nextInt(possibleJuraSpawnPoints.length);
+    final spawn = possibleJuraSpawnPoints.elementAt(juraSpawnPointIndex);
+    _lastJuraSpawnPoint = spawn;
+
+    return spawn;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    map = await TiledComponent.load(
+      Assets.world.level,
+      Vector2.all(worldTileSize),
+      prefix: '',
+    );
 
     final joystickBackgroundPaint = BasicPalette.black.withAlpha(100).paint();
     joystick = JoystickComponent(
@@ -61,13 +101,21 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
       margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
+    final initialPosition = _getPlayerSpawnPoint();
+
     player = Player(
       joystick: joystick,
-      position: possiblePlayerSpawnPoints.elementAt(playerSpawnPointIndex),
+      position: initialPosition,
+    );
+    jura = Jura(
+      position: Vector2(
+        initialPosition.x + 50,
+        initialPosition.y + 50,
+      ),
     );
 
     final gameTitleComponent = TextComponent(
-      text: 'Finding Jura ',
+      text: 'Finding Jura - с днем рождения Алена',
       textRenderer: TextPaint(
         style: TextStyle(
           fontFamily: 'PressStart2P',
@@ -86,21 +134,14 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
     );
 
     gameTimer = CountdownTimerComponent(
-      duration: 300, // 5 minutes
+      duration: startingTime,
       position: Vector2(10, 35),
       onTimerComplete: () {
-        print('Time\'s up!');
-        // Add your game over logic here
-      },
-      onTimeUpdate: (time) {
-        if (time == 59) {
-          // Last 60 seconds
-          print('Less than a minute remaining!');
-        }
+        gameOver();
       },
     );
 
-    addAll([map, player]);
+    addAll([map, jura, player]);
     game.cameraComponent.viewport.addAll([
       joystick,
       gameTitleComponent,
@@ -127,9 +168,55 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
       ),
     );
   }
+
+  void gameWin() {
+    if (gameStatus == GameStatus.won || gameStatus == GameStatus.lost) {
+      return;
+    }
+
+    gameStatus = GameStatus.won;
+    gameTimer.pause();
+    game.overlays.add("GameWin");
+  }
+
+  void gameOver() {
+    if (gameStatus == GameStatus.won || gameStatus == GameStatus.lost) {
+      return;
+    }
+
+    gameStatus = GameStatus.lost;
+    gameTimer.pause();
+    game.overlays.add("GameOver");
+  }
+
+  void restart() {
+    gameTimer.reset();
+    gameTimer.start();
+    gameStatus = GameStatus.playing;
+    game.overlays.remove("GameOver");
+    game.overlays.remove("GameWin");
+
+    Vector2 playerSpawnPoint;
+    while (true) {
+      playerSpawnPoint = _getPlayerSpawnPoint();
+      if (_lastJuraSpawnPoint != playerSpawnPoint) {
+        break;
+      }
+    }
+    player.position = playerSpawnPoint;
+
+    Vector2 juraSpawnPoint;
+    while (true) {
+      juraSpawnPoint = _getJuraSpawnPoint();
+      if (_lastPlayerSpawnPoint != juraSpawnPoint) {
+        break;
+      }
+    }
+    jura.position = juraSpawnPoint;
+  }
 }
 
 // Cheveux 696057
 // 332a23
-// с днем рождения Алена
+//
 // f2e5d6

@@ -5,7 +5,8 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
-class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
+class FindJuraGame extends FlameGame
+    with HasKeyboardHandlerComponents, HasCollisionDetection {
   late final CameraComponent cameraComponent;
 
   @override
@@ -15,6 +16,8 @@ class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
     cameraComponent = CameraComponent(world: world);
     images.prefix = '';
   }
+
+  get score => world.score;
 
   @override
   Color backgroundColor() => const Color(0xFF84C669);
@@ -29,8 +32,13 @@ class FindJuraGame extends FlameGame with HasKeyboardHandlerComponents {
       Assets.characters.player.poses.run4.path,
       Assets.characters.player.poses.run5.path,
       Assets.characters.player.poses.run6.path,
+      Assets.characters.cat1.path,
       Assets.hud.inputs.tile0012.path,
     ]);
     addAll([cameraComponent, world]);
+  }
+
+  void restart() {
+    world.restart();
   }
 }

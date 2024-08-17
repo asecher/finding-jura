@@ -1,6 +1,7 @@
 import 'package:finding_jura/assets.gen.dart';
 import 'package:finding_jura/constants.dart';
 import 'package:finding_jura/game.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 
@@ -38,6 +39,7 @@ class Player extends PositionComponent
           anchor: Anchor.center,
           priority: 1,
           size: playerSize,
+          children: [RectangleHitbox()],
           position: position,
         );
 

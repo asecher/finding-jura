@@ -1,4 +1,6 @@
 import 'package:finding_jura/game.dart';
+import 'package:finding_jura/overlays/game_over.dart';
+import 'package:finding_jura/overlays/game_win.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
@@ -8,9 +10,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.game});
-
   final FindJuraGame game;
+
+  const MyApp({super.key, required this.game});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: GameWidget(game: game),
+      home: GameWidget<FindJuraGame>(
+        game: game,
+        overlayBuilderMap: {
+          'GameOver': (_, game) => GameOver(game: game),
+          'GameWin': (_, game) => GameWin(game: game),
+        },
+      ),
     );
   }
 }
