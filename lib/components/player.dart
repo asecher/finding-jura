@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 class Player extends PositionComponent
     with KeyboardHandler, HasGameReference<FindJuraGame> {
-  static Vector2 playerSize = Vector2(32, 60);
+  static Vector2 playerSize = Vector2(26, 48);
   static final keysUp = <LogicalKeyboardKey>{
     LogicalKeyboardKey.keyW,
     LogicalKeyboardKey.keyZ,
@@ -28,17 +28,22 @@ class Player extends PositionComponent
 
   final JoystickComponent joystick;
 
-  Player({required this.joystick})
-      : super(
+  @override
+  bool get debugMode => false;
+
+  Player({
+    required this.joystick,
+    required Vector2 position,
+  }) : super(
           anchor: Anchor.center,
           priority: 1,
           size: playerSize,
-          position: Vector2(0, 0),
+          position: position,
         );
 
   int horizontalDirection = 0;
   Vector2 movement = Vector2.zero();
-  double speed = worldTileSize * 4;
+  double speed = worldTileSize * 3.5;
 
   late SpriteComponent idleComponent;
   late SpriteAnimationComponent runAnimation;

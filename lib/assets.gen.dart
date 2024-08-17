@@ -26,11 +26,17 @@ class $AssetsHudGen {
 class $AssetsWorldGen {
   const $AssetsWorldGen();
 
+  /// File path: assets/world/level.tmx
+  String get level => 'assets/world/level.tmx';
+
   /// Directory path: assets/world/tilemap
   $AssetsWorldTilemapGen get tilemap => const $AssetsWorldTilemapGen();
 
   /// Directory path: assets/world/tiles
   $AssetsWorldTilesGen get tiles => const $AssetsWorldTilesGen();
+
+  /// List of all assets
+  List<String> get values => [level];
 }
 
 class $AssetsCharactersPlayerGen {
@@ -598,8 +604,11 @@ class $AssetsWorldTilesGen {
   AssetGenImage get tile0131 =>
       const AssetGenImage('assets/world/tiles/tile_0131.png');
 
+  /// File path: assets/world/tiles/tilemap.tsx
+  String get tilemap => 'assets/world/tiles/tilemap.tsx';
+
   /// List of all assets
-  List<AssetGenImage> get values => [
+  List<dynamic> get values => [
         tile0000,
         tile0001,
         tile0002,
@@ -731,7 +740,8 @@ class $AssetsWorldTilesGen {
         tile0128,
         tile0129,
         tile0130,
-        tile0131
+        tile0131,
+        tilemap
       ];
 }
 
