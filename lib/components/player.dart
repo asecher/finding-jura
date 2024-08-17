@@ -1,4 +1,5 @@
 import 'package:finding_jura/assets.gen.dart';
+import 'package:finding_jura/components/unwalkable.dart';
 import 'package:finding_jura/constants.dart';
 import 'package:finding_jura/game.dart';
 import 'package:flame/collisions.dart';
@@ -6,7 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 
 class Player extends PositionComponent
-    with KeyboardHandler, HasGameReference<FindJuraGame> {
+    with KeyboardHandler, HasGameReference<FindJuraGame>, CollisionCallbacks {
   static Vector2 playerSize = Vector2(26, 48);
   static final keysUp = <LogicalKeyboardKey>{
     LogicalKeyboardKey.keyW,
@@ -41,7 +42,9 @@ class Player extends PositionComponent
           size: playerSize,
           children: [RectangleHitbox()],
           position: position,
-        );
+        ) {
+    halfSize = size / 2;
+  }
 
   int horizontalDirection = 0;
   Vector2 movement = Vector2.zero();
@@ -49,6 +52,8 @@ class Player extends PositionComponent
 
   late SpriteComponent idleComponent;
   late SpriteAnimationComponent runAnimation;
+  late Vector2 halfSize;
+  late Vector2 maxPosition = game.world.size - halfSize;
 
   @override
   Future<void> onLoad() async {
@@ -109,7 +114,50 @@ class Player extends PositionComponent
     }
 
     position.add(movementThisFrame);
+
+    if (movement.y < 0) {
+      // Moving up
+      final newTop = positionOfAnchor(Anchor.topCenter);
+      for (final component in game.world.componentsAtPoint(newTop)) {
+        if (component is UnwalkableArea) {
+          movementThisFrame.y = 0;
+          break;
+        }
+      }
+    }
+    if (movement.y > 0) {
+      // Moving down
+      final newBottom = positionOfAnchor(Anchor.bottomCenter);
+      for (final component in game.world.componentsAtPoint(newBottom)) {
+        if (component is UnwalkableArea) {
+          movementThisFrame.y = 0;
+          break;
+        }
+      }
+    }
+    if (movement.x < 0) {
+      // Moving left
+      final newLeft = positionOfAnchor(Anchor.centerLeft);
+      for (final component in game.world.componentsAtPoint(newLeft)) {
+        if (component is UnwalkableArea) {
+          movementThisFrame.x = 0;
+          break;
+        }
+      }
+    }
+    if (movement.x > 0) {
+      // Moving right
+      final newRight = positionOfAnchor(Anchor.centerRight);
+      for (final component in game.world.componentsAtPoint(newRight)) {
+        if (component is UnwalkableArea) {
+          movementThisFrame.x = 0;
+          break;
+        }
+      }
+    }
+
     position = originalPosition..add(movementThisFrame);
+    position.clamp(halfSize, maxPosition);
 
     if (movementThisFrame.length2 == 0) {
       if (children.contains(runAnimation)) {

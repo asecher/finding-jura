@@ -4,6 +4,7 @@ import 'package:finding_jura/assets.gen.dart';
 import 'package:finding_jura/components/jura.dart';
 import 'package:finding_jura/components/player.dart';
 import 'package:finding_jura/components/timer.dart';
+import 'package:finding_jura/components/unwalkable.dart';
 import 'package:finding_jura/constants.dart';
 import 'package:finding_jura/game.dart';
 import 'package:flame/components.dart';
@@ -101,17 +102,15 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
       margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
-    final initialPosition = _getPlayerSpawnPoint();
-
+    final initialPlayerPosition = _getPlayerSpawnPoint();
     player = Player(
       joystick: joystick,
-      position: initialPosition,
+      position: Vector2(125, 125),
     );
+
+    final initialJuraPosition = _getJuraSpawnPoint();
     jura = Jura(
-      position: Vector2(
-        initialPosition.x + 50,
-        initialPosition.y + 50,
-      ),
+      position: initialJuraPosition,
     );
 
     final gameTitleComponent = TextComponent(
@@ -142,6 +141,19 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
     );
 
     addAll([map, jura, player]);
+
+    final objectGroup = map.tileMap.getLayer<ObjectGroup>('unwalkable')!;
+    for (final object in objectGroup.objects) {
+      if (!object.isPolygon) continue;
+      final vertices = object.polygon
+          .map((point) => Vector2(
+                (point.x + object.x) * worldScale,
+                (point.y + object.y) * worldScale,
+              ))
+          .toList();
+      add(UnwalkableArea(vertices));
+    }
+
     game.cameraComponent.viewport.addAll([
       joystick,
       gameTitleComponent,
