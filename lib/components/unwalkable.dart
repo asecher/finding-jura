@@ -1,12 +1,23 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-class UnwalkableArea extends PolygonComponent with CollisionCallbacks {
+class UnwalkableArea extends PolygonComponent {
   UnwalkableArea(super.vertices);
 
   @override
+  bool get debugMode => false;
+
+  @override
+  bool get renderShape => false;
+}
+
+class UnwalkableRectangle extends RectangleComponent with CollisionCallbacks {
+  UnwalkableRectangle(Vector2 position, Vector2 size)
+      : super(position: position, size: size);
+
+  @override
   Future<void> onLoad() async {
-    add(PolygonHitbox(vertices));
+    add(RectangleHitbox());
   }
 
   @override
@@ -14,4 +25,8 @@ class UnwalkableArea extends PolygonComponent with CollisionCallbacks {
 
   @override
   bool get renderShape => false;
+}
+
+bool isUnwalkable(Component component) {
+  return component is UnwalkableArea || component is UnwalkableRectangle;
 }

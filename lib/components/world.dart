@@ -144,14 +144,15 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
 
     final objectGroup = map.tileMap.getLayer<ObjectGroup>('unwalkable')!;
     for (final object in objectGroup.objects) {
-      if (!object.isPolygon) continue;
-      final vertices = object.polygon
-          .map((point) => Vector2(
-                (point.x + object.x) * worldScale,
-                (point.y + object.y) * worldScale,
-              ))
-          .toList();
-      add(UnwalkableArea(vertices));
+      if (object.isPolygon) {
+        final vertices = object.polygon
+            .map((point) => Vector2(
+                  (point.x + object.x) * worldScale,
+                  (point.y + object.y) * worldScale,
+                ))
+            .toList();
+        add(UnwalkableArea(vertices));
+      }
     }
 
     game.cameraComponent.viewport.addAll([
@@ -159,6 +160,7 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
       gameTitleComponent,
       gameTimer,
     ]);
+
     game.cameraComponent.follow(player);
 
     gameTimer.start();

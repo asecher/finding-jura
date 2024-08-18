@@ -115,41 +115,41 @@ class Player extends PositionComponent
 
     position.add(movementThisFrame);
 
-    if (movement.y < 0) {
+    if (movementThisFrame.y < 0) {
       // Moving up
       final newTop = positionOfAnchor(Anchor.topCenter);
       for (final component in game.world.componentsAtPoint(newTop)) {
-        if (component is UnwalkableArea) {
+        if (isUnwalkable(component)) {
           movementThisFrame.y = 0;
           break;
         }
       }
     }
-    if (movement.y > 0) {
+    if (movementThisFrame.y > 0) {
       // Moving down
       final newBottom = positionOfAnchor(Anchor.bottomCenter);
       for (final component in game.world.componentsAtPoint(newBottom)) {
-        if (component is UnwalkableArea) {
+        if (isUnwalkable(component)) {
           movementThisFrame.y = 0;
           break;
         }
       }
     }
-    if (movement.x < 0) {
+    if (movementThisFrame.x < 0) {
       // Moving left
       final newLeft = positionOfAnchor(Anchor.centerLeft);
       for (final component in game.world.componentsAtPoint(newLeft)) {
-        if (component is UnwalkableArea) {
+        if (isUnwalkable(component)) {
           movementThisFrame.x = 0;
           break;
         }
       }
     }
-    if (movement.x > 0) {
+    if (movementThisFrame.x > 0) {
       // Moving right
       final newRight = positionOfAnchor(Anchor.centerRight);
       for (final component in game.world.componentsAtPoint(newRight)) {
-        if (component is UnwalkableArea) {
+        if (isUnwalkable(component)) {
           movementThisFrame.x = 0;
           break;
         }
