@@ -105,7 +105,7 @@ class FindJuraWorld extends World with HasGameReference<FindJuraGame> {
     final initialPlayerPosition = _getPlayerSpawnPoint();
     player = Player(
       joystick: joystick,
-      position: Vector2(125, 125),
+      position: initialPlayerPosition,
     );
 
     final initialJuraPosition = _getJuraSpawnPoint();

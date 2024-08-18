@@ -15,19 +15,28 @@ class GameWin extends StatefulWidget {
 }
 
 class _GameWinState extends State<GameWin> {
-  late ConfettiController _confettiController;
+  late ConfettiController _confettiControllerLeft;
+  late ConfettiController _confettiControllerRight;
 
   @override
   void initState() {
     super.initState();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 5));
-    _confettiController.play();
+    _confettiControllerLeft =
+        ConfettiController(duration: const Duration(seconds: 12));
+    _confettiControllerLeft.play();
+
+    _confettiControllerRight =
+        ConfettiController(duration: const Duration(seconds: 10));
+
+    Future.delayed(const Duration(seconds: 2), () {
+      _confettiControllerRight.play();
+    });
   }
 
   @override
   void dispose() {
-    _confettiController.dispose();
+    _confettiControllerLeft.dispose();
+    _confettiControllerRight.dispose();
     super.dispose();
   }
 
@@ -98,16 +107,38 @@ class _GameWinState extends State<GameWin> {
             ),
           ),
         ),
-        Align(
-          alignment: Alignment.topCenter,
+        Positioned(
+          bottom: 0,
+          left: 75,
           child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirection: math.pi / 2,
-            maxBlastForce: 5,
-            minBlastForce: 2,
-            emissionFrequency: 0.05,
-            numberOfParticles: 50,
-            gravity: 0.1,
+            confettiController: _confettiControllerLeft,
+            blastDirection: -math.pi / 2,
+            emissionFrequency: 0.01,
+            numberOfParticles: 20,
+            maxBlastForce: 100,
+            minBlastForce: 80,
+            gravity: 0.3,
+            shouldLoop: false,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.orange,
+              Colors.purple
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 75,
+          child: ConfettiWidget(
+            confettiController: _confettiControllerRight,
+            blastDirection: -math.pi / 2,
+            emissionFrequency: 0.01,
+            numberOfParticles: 20,
+            maxBlastForce: 100,
+            minBlastForce: 80,
+            gravity: 0.3,
             shouldLoop: false,
             colors: const [
               Colors.green,

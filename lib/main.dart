@@ -1,10 +1,22 @@
+import 'dart:io';
+
 import 'package:finding_jura/game.dart';
 import 'package:finding_jura/overlays/game_over.dart';
 import 'package:finding_jura/overlays/game_win.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
   final game = FindJuraGame();
   runApp(MyApp(game: game));
 }
